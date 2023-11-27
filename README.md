@@ -125,11 +125,27 @@ MCSDK comes with the capability to auto calculate the Kp and Ki parameters for t
 #### 2.1 Fine tuning MCSDK parameters
 
 ##### 2.1.1 PWM frequency
+40kHz detailled soon
 ##### 2.1.2 Speed sensing
+Sensorless PLL detailled soon
 
-#### 2.2 PI tuning
+#### 2.2 PI tuning of the speed regulator
+While a comprehensive understanding of Control Theory is not needed, it is important to have some [basic knowledge](https://en.wikipedia.org/wiki/Nonlinear_control) about it. I am not by any means an expert on Control Theory and will only give you a basic understanding of how to tune the PI controllers.
 
 ##### 2.2.1 PI tuning for dummies
+![Speed PI](./img/Speed%20regulator.png)
+
+In order to have a fast and accurate speed control, you need to tune the PI controller of the speed regulator. The P and I values are calculated by the following formulas:
+```
+    P = Kp / KpDivisor
+    I = Ki / KiDivisor
+```
+Where Kp and Ki are integers and KpDivisor and KiDivisor are power of 2 integers. If you already have some Control Theory knowledge, you might be used to tune P and I through a single float value but the methodology here is still the same.
+
+The easiest way to determine the right values for Kp and Ki is to use the Motor Pilot tool through experimentation by plotting the speed sensed by the board after a set of step input.
+
+*Special thanks to Léo V. and Vincent Q. for their help on this part.*
+
 ##### 2.2.2 Troubleshooting with an integral term in CubeIDE
 The Ki parameter is not implemented correctly in the firmware package provided by ST. At board reset, the Ki parameter will be set to 0. In order to fix it, you need to modify the code in the file `YOUR-PROJECT-NAME/Application/User/mc_tasks.c` at line 540. You need to replace the following code:
 ```c
@@ -145,3 +161,5 @@ With X an integer being the value of Ki. For me Ki=2 was a good value (Your Ki v
 
 ### 3. Spinning in the right direction
 At this point you should have a working motor that is able to spin at the right speed depending on the input command (given by the duty cycle of the PWM signal). However, in order to use the motor for a differential drive robot, you need to be able to spin both ways. Has the code generated previously is primarily designed to control drones, you need to modify it in order to be able to spin the motor in both directions.
+
+My approach here was to modify the input processing function. By splitting in two the PWM duty cycle range, you can have a positive speed command for a duty cycle between 1060 and 1460 us and a negative speed command for a duty cycle between 1460 and 1860 us.
