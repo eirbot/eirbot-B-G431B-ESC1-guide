@@ -1,4 +1,7 @@
-# eirbot-B-G431B-ESC1-guide
+# Eirbot-B-G431B-ESC1-guide
+
+# **This guide is a work in progress**
+
 An overview on how to use and control ST's B-G431B-ESC1 to control brushless motors such as the EC 45 flat (Maxon)
 
 I am not by any means an expert on brushless motoors nor an electrical engineer. This is just a guide to help you get started with the B-G431B-ESC1 board. Most of this guide applies to any brushless motor but some parts are specific to the EC 45 flat motor.
