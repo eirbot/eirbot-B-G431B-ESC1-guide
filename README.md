@@ -4,7 +4,7 @@ An overview on how to use and control ST's B-G431B-ESC1 to control brushless mot
 I am not by any means an expert on brushless motoors nor an electrical engineer. This is just a guide to help you get started with the B-G431B-ESC1 board. Most of this guide applies to any brushless motor but some parts are specific to the EC 45 flat motor.
 
 This repository contains the following files:
-- `EC 45 flat brushless motor documentation`: Documentation provided by Maxon for the EC 45 70W flat motor used by Eirbot
+- `EC 45 Flat Brushless Motor Documentation`: Documentation provided by Maxon for the EC 45 70W flat motor used by Eirbot
 - `B-G431B-ESC1 User Manual`: Documentation provided by ST for the B-G431B-ESC1 board
 - `An already tuned project for the B-G431B-ESC1 board in /project`
 
@@ -51,8 +51,8 @@ The basic workflow to get the board working is the following:
 
 1. Profile the motor with Motor Profiler and save them, you should see your motor spin by the end of this step
 2. Open MCSDK and create a new project with Algorithm = FOC, Hardware = inverter 
-    2.1. Select the motor profiled in Motor Profiler in the Motor tab
-    2.2. Select the B-G431B-ESC1 board in Inverter tab
+    - Select the motor profiled in Motor Profiler in the Motor tab
+    - Select the B-G431B-ESC1 board in Inverter tab
 3. Tune the parameters in MCSDK and **make sure the Electronic Speed Control parameter is on in the Stage Configuration tab (If not create a new project in MCSDK by modifying the exemple project for the B-G431B-ESC1 board)**
 4. Generate the project in MCSDK, choose the right version of the firmware package, and CubeMX while targeting CubeIDE as the toolchain
 5. Click the "RUN STM32CubeMX" button in MCSDK to open CubeMX after the project generation (Don't worry about the error 'The ST intranet updater server is unknown')
@@ -66,10 +66,10 @@ The following steps detail how to get the board working in order to have a **spe
 
 ### 1. Profile the motor with Motor Profiler
 
-### 2. Finding the right Kp and Ki values
+### 2.1 Finding the right Kp and Ki values
 
-#### 2.1 PI tuning for dummies
-#### 2.2. Troubleshooting with an integral term in CubeIDE
+#### 2.1.1 PI tuning for dummies
+#### 2.1.2 Troubleshooting with an integral term in CubeIDE
 The Ki parameter is not implemented correctly in the firmware package provided by ST. At board reset, the Ki parameter will be set to 0. In order to fix it, you need to modify the code in the file `YOUR-PROJECT-NAME/Application/User/mc_tasks.c` at line 540. You need to replace the following code:
 ```c
                     PID_SetIntegralTerm(&PIDSpeedHandle_M1,
@@ -81,7 +81,12 @@ by this code:
                     PID_SetIntegralTerm(&PIDSpeedHandle_M1, X);
 ```
 With X an integer being the value of Ki. For me Ki=2 was a good value (Your Ki value can be found with the methodology listed above and will be stored in the macro PID_SPEED_KI_DEFAULT inside `drive_parameters.h`). **X isn't Ki / KiDivisor**
-        
+
+### 2.2 Fine tuning MCSDK parameters
+
+#### 2.2.1 PWM frequency
+#### 2.2.2 Speed sensing
+
 ### 3. Spinning in the right direction
 
 
