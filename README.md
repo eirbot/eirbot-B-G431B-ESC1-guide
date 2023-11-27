@@ -4,7 +4,7 @@
 
 An overview on how to use and control ST's B-G431B-ESC1 to control brushless motors such as the EC 45 flat (Maxon)
 
-I am not by any means an expert on brushless motoors nor an electrical engineer. This is just a guide to help you get started with the B-G431B-ESC1 board. Most of this guide applies to any brushless motor but some parts are specific to the EC 45 flat motor.
+I am not by any means an expert on brushless motors nor an electrical engineer. This is just a guide to help you get started with the B-G431B-ESC1 board. Most of this guide applies to any brushless motor but some parts are specific to the EC 45 flat motor.
 
 This repository contains the following files:
 - `EC 45 Flat Brushless Motor Documentation`: Documentation provided by Maxon for the EC 45 70W flat motor used by Eirbot
@@ -140,7 +140,7 @@ In order to have a fast and accurate speed control, you need to tune the PI cont
     P = Kp / KpDivisor
     I = Ki / KiDivisor
 ```
-Where Kp and Ki are integers and KpDivisor and KiDivisor are power of 2 integers. If you already have some Control Theory knowledge, you might be used to tune P and I through a single float value but the methodology here is still the same.
+Where Kp and Ki are integers and KpDivisor and KiDivisor are power of 2 integers. If you already have some Control Theory knowledge, you might be used to tune P and I through a single float value but the methodology here is still the same. The execution rate of the PI is 1ms.
 
 The easiest way to determine the right values for Kp and Ki is to use the Motor Pilot tool through experimentation by plotting the speed sensed by the board after a set of step input.
 
