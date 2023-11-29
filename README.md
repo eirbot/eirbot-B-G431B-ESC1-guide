@@ -165,8 +165,68 @@ At this point you should have a working motor that is able to spin at the right 
 
 My approach here was to modify the input processing function. By splitting in two the PWM duty cycle range, you can have a positive speed command for a duty cycle between 1060 and 1460 us and a negative speed command for a duty cycle between 1460 and 1860 us.
 
-
 In order to change the direction you must set pHandle->hFinalSpeed to +hFinalSpeed or -hFinalSpeed inside function:
 ```cpp
 __weak void MCI_ExecSpeedRamp(MCI_Handle_t *pHandle, int16_t hFinalSpeed, uint16_t hDurationms)
 ```
+
+To be able to have that change globally you must have a variable that is set to 1 or -1 depending on the direction you want to spin. I choose to modify the MCI_Handle_t structure in `mc_interface.h` by adding the following variable:
+```cpp
+ int16_t hDirection;
+```
+
+Then I created a setter function in `mc_interface.c`:
+```cpp
+__weak void MCI_SetDirection(MCI_Handle_t *pHandle, int16_t hDir)
+{
+#ifdef NULL_PTR_CHECK_MC_INT
+  if (MC_NULL == pHandle)
+  {
+    /* Nothing to do */
+  }
+  else
+  {
+#endif
+    pHandle->hDirection = hDir;
+#ifdef NULL_PTR_CHECK_MC_INT
+  }
+#endif
+}
+```
+
+The MCI_ExecSpeedRamp is then modified as follow:
+```cpp
+__weak void MCI_ExecSpeedRamp(MCI_Handle_t *pHandle, int16_t hFinalSpeed, uint16_t hDurationms)
+{
+#ifdef NULL_PTR_CHECK_MC_INT
+  if (MC_NULL == pHandle)
+  {
+    /* Nothing to do */
+  }
+  else
+  {
+#endif
+      if (pHandle->hDirection < 0)
+      {
+        hFinalSpeed = -hFinalSpeed;
+      }
+      else
+      {
+        hFinalSpeed = hFinalSpeed;
+      }
+    pHandle->hFinalSpeed = hFinalSpeed;
+    pHandle->lastCommand = MCI_CMD_EXECSPEEDRAMP;
+    pHandle->hDurationms = hDurationms;
+    pHandle->CommandState = MCI_COMMAND_NOT_ALREADY_EXECUTED;
+    pHandle->LastModalitySetByUser = MCM_SPEED_MODE;
+
+#ifdef NULL_PTR_CHECK_MC_INT
+  }
+#endif
+}
+```
+
+Finally, you need to call the MCI_SetDirection when executing any the speed ramp in `esc.c`:
+```cpp
+    MCI_SetDirection(pMCI[pESC_params->motor], -1);
+``` 
