@@ -125,7 +125,8 @@ MCSDK comes with the capability to auto calculate the Kp and Ki parameters for t
 #### 2.1 Fine tuning MCSDK parameters
 
 ##### 2.1.1 PWM frequency
-40kHz detailled soon
+Generally, you'll want to have a PWM frequency as high as possible for your ESC in order to have a smooth control of the motor. Also, having a too low PWM frequency can create a lot of undesired noise. The choice has been made here to use 40kHz but anything above 30kHz should do the trick.
+
 ##### 2.1.2 Speed sensing
 Sensorless PLL detailled soon
 
@@ -148,13 +149,13 @@ The easiest way to determine the right values for Kp and Ki is to use the Motor 
 
 ##### 2.2.2 Troubleshooting with an integral term in CubeIDE
 The Ki parameter is not implemented correctly in the firmware package provided by ST. At board reset, the Ki parameter will be set to 0. In order to fix it, you need to modify the code in the file `YOUR-PROJECT-NAME/Application/User/mc_tasks.c` at line 540. You need to replace the following code:
-```c
+```cpp
                     PID_SetIntegralTerm(&PIDSpeedHandle_M1,
                                     (((int32_t)FOCVars[M1].Iqdref.q * (int16_t)PID_GetKIDivisor(&PIDSpeedHandle_M1))
                                     / PID_SPEED_INTEGRAL_INIT_DIV));
 ```
 by this code:
-```c
+```cpp
                     PID_SetIntegralTerm(&PIDSpeedHandle_M1, X);
 ```
 With X an integer being the value of Ki. For me Ki=2 was a good value (Your Ki value can be found with the methodology listed above and will be stored in the macro PID_SPEED_KI_DEFAULT inside `drive_parameters.h`). **X isn't Ki / KiDivisor**
@@ -163,3 +164,9 @@ With X an integer being the value of Ki. For me Ki=2 was a good value (Your Ki v
 At this point you should have a working motor that is able to spin at the right speed depending on the input command (given by the duty cycle of the PWM signal). However, in order to use the motor for a differential drive robot, you need to be able to spin both ways. Has the code generated previously is primarily designed to control drones, you need to modify it in order to be able to spin the motor in both directions.
 
 My approach here was to modify the input processing function. By splitting in two the PWM duty cycle range, you can have a positive speed command for a duty cycle between 1060 and 1460 us and a negative speed command for a duty cycle between 1460 and 1860 us.
+
+
+In order to change the direction you must set pHandle->hFinalSpeed to +hFinalSpeed or -hFinalSpeed inside function:
+```cpp
+__weak void MCI_ExecSpeedRamp(MCI_Handle_t *pHandle, int16_t hFinalSpeed, uint16_t hDurationms)
+```
