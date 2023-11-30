@@ -1,4 +1,4 @@
-# Eirbot-B-G431B-ESC1-guide
+# Eirbot B-G431B-ESC1 guide for brushless motors
 
 # **This guide is a work in progress**
 
@@ -129,6 +129,8 @@ Generally, you'll want to have a PWM frequency as high as possible for your ESC 
 
 ##### 2.1.2 Speed sensing
 Sensorless PLL detailled soon
+
+https://community.st.com/t5/stm32-mcus-motor-control/pll-vs-cordic/td-p/252078
 
 #### 2.2 PI tuning of the speed regulator
 While a comprehensive understanding of Control Theory is not needed, it is important to have some [basic knowledge](https://en.wikipedia.org/wiki/Nonlinear_control) about it. I am not by any means an expert on Control Theory and will only give you a basic understanding of how to tune the PI controllers.
